@@ -16,4 +16,6 @@ logs/
 # Исключаем файлы среды разработки (например, PyCharm, VS Code)
 .vscode/
 .idea/
+
 login_data.txt
+tokens.json
