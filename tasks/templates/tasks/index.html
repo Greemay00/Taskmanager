@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Мои задачи</title>
+</head>
+<body>
+    <h1>Мои задачи</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        <input type="text" name="title" placeholder="Новая задача">
+        <button type="submit">Добавить</button>
+    </form>
+
+    <ul>
+        {% for task in tasks %}
+            <li>
+                {{ task.title }} —
+                {% if task.completed %}
+                    ✅
+                {% else %}
+                    <form method="post" action="{% url 'task_complete' task.id %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit">Отметить как выполненную</button>
+                    </form>
+                {% endif %}
+
+                <form method="post" action="{% url 'task_delete' task.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit">Удалить</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Мои задачи</title>
+</head>
+<body>
+  <h1>Авторизация</h1>
+  <input type="text" id="username" placeholder="Имя пользователя"><br>
+  <input type="password" id="password" placeholder="Пароль"><br>
+  <button onclick="login()">Войти</button>
+
+  <h1>Мои задачи</h1>
+  <ul id="task-list"></ul>
+
+  <h2>Добавить задачу</h2>
+  <input type="text" id="task-title" placeholder="Название задачи" />
+  <textarea id="task-desc" placeholder="Описание задачи"></textarea><br>
+  <button onclick="addTask()">Добавить</button>
+
+  <script>
+    let accessToken = '';
+    let refreshToken = '';
+
+    async function login() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      const response = await fetch('http://127.0.0.1:8000/api/token/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        accessToken = data.access;
+        refreshToken = data.refresh;
+        alert('Успешный вход!');
+        loadTasks();
+      } else {
+        alert('Ошибка входа!');
+      }
+    }
+
+    async function loadTasks() {
+      const response = await fetch('http://127.0.0.1:8000/api/tasks/', {
+        headers: {
+          'Authorization': 'Bearer ' + accessToken
+        }
+      });
+      const data = await response.json();
+      const list = document.getElementById('task-list');
+      list.innerHTML = '';
+      data.forEach(task => {
+        const li = document.createElement('li');
+        li.textContent = `${task.title} — ${task.completed ? '✓' : '✗'}`;
+        list.appendChild(li);
+      });
+    }
+
+    async function addTask() {
+      const title = document.getElementById('task-title').value;
+      const description = document.getElementById('task-desc').value;
+
+      const response = await fetch('http://127.0.0.1:8000/api/tasks/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + accessToken
+        },
+        body: JSON.stringify({ title, description, completed: false })
+      });
+
+      if (response.ok) {
+        alert('Задача добавлена!');
+        loadTasks();
+      } else {
+        alert('Ошибка при добавлении. Возможно, истёк access токен.');
+      }
+    }
+  </script>
+</body>
+</html>

@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'tasks',
     'rest_framework',
     'drf_spectacular',
+    'corsheaders', 
 ]
 
 MIDDLEWARE = [
@@ -50,7 +51,11 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # ← очень важно ДО CommonMiddleware
+    'django.middleware.common.CommonMiddleware',
+    
 ]
+CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'taskmanager.urls'
 
@@ -150,4 +155,19 @@ SPECTACULAR_SETTINGS = {
             }
         }
     },
+}
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    # access‑токен будет жить 1 час (по умолчанию 5 минут)
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
+
+    # refresh‑токен будет жить 7 дней (по умолчанию 1 день)
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+
+    # будем при обновлении выдавать новый refresh‑токен
+    'ROTATE_REFRESH_TOKENS': True,
+
+    # после ротации старый refresh добавляется в blacklist (если используешь Blacklist app)
+    'BLACKLIST_AFTER_ROTATION': True,
 }

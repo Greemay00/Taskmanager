@@ -1,31 +1,25 @@
-import json
 import requests
+import json
 
-def refresh_access_token():
-    try:
-        with open('tokens.json') as f:
-            tokens = json.load(f)
-    except FileNotFoundError:
-        print("Файл tokens.json не найден.")
-        return
+# Замените на свой логин и пароль
+USERNAME = "superuser"
+PASSWORD = "1643adg12"
 
-    response = requests.post(
-        'http://127.0.0.1:8000/api/token/refresh/',
-        json={'refresh': tokens['refresh']}
-    )
+TOKEN_URL = "http://127.0.0.1:8000/api/token/"
+TOKENS_FILE = "tokens.json"
 
-    print("Ответ сервера:", response.status_code, response.text)
+def get_tokens(username, password):
+    data = {"username": username, "password": password}
+    response = requests.post(TOKEN_URL, json=data)
 
     if response.status_code == 200:
-        new_access = response.json().get('access')
-        if new_access:
-            tokens['access'] = new_access
-            with open('tokens.json', 'w') as f:
-                json.dump(tokens, f, indent=4)
-            print("✅ Access token успешно обновлён!")
-        else:
-            print("❌ Не удалось получить новый access токен.")
+        tokens = response.json()
+        with open(TOKENS_FILE, "w") as f:
+            json.dump(tokens, f, indent=4)
+        print("✅ Токены успешно обновлены и сохранены в tokens.json")
     else:
-        print("❌ Ошибка при обновлении токена.")
+        print("❌ Ошибка получения токенов:", response.status_code)
+        print(response.text)
 
-refresh_access_token()
+if __name__ == "__main__":
+    get_tokens(USERNAME, PASSWORD)

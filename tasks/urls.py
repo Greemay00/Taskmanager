@@ -1,13 +1,16 @@
+# tasks/urls.py
+
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import TaskListCreateView, TaskDetailView
 from .views import TaskViewSet
+from . import views
 
 router = DefaultRouter()
-router.register(r'api', TaskViewSet, basename='task')
+router.register(r'tasks', TaskViewSet, basename='task')  
+# пустой префикс, потому что префикс "tasks" уже в главном urls.py
 
 urlpatterns = [
-    path('api/', TaskListCreateView.as_view(), name='task_list_create'),  
-    path('api/<int:pk>/', TaskDetailView.as_view(), name='task_detail'),
-    path('', include(router.urls)),
+    path('', views.task_list_view, name='task_list'),
+    path('complete/<int:task_id>/', views.task_complete_view, name='task_complete'),
+    path('delete/<int:task_id>/', views.task_delete_view, name='task_delete'),
 ]
